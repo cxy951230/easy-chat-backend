@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: user
+  redis:
+    host: 10.211.55.4
+    port: 6379
+    database: 0
+    jedis:
+      pool:
+        # 最大阻塞等待时间，负数表示没有限制
+        max-wait: -1
+        # 连接池中的最大空闲连接
+        max-idle: 5
+        # 连接池中的最小空闲连接
+        min-idle: 0
+        # 连接池中最大连接数，负数表示没有限制
+        max-active: 20
+
+# mybatis-plus配置
+mybatis-plus:
+  # xml文件位置
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.cxy.entity
+#  datasource:
+#    druid:
+#      master1:
+#        url: jdbc:mysql://10.211.55.4:3306/test?useTimezone=true&serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&amp&characterEncoding=utf-8
+#        username: root
+#        password: 123456
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#      master2:
+#        url: jdbc:mysql://10.211.55.4:3307/test?useTimezone=true&serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&amp&characterEncoding=utf-8
+#        username: root
+#        password: 123456
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#      slave1:
+#        url: jdbc:mysql://10.211.55.4:3308/test?useTimezone=true&serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&amp&characterEncoding=utf-8
+#        username: root
+#        password: 123456
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#      slave2:
+#        url: jdbc:mysql://10.211.55.4:3309/test?useTimezone=true&serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&amp&characterEncoding=utf-8
+#        username: root
+#        password: 123456
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#  redis:
+#    host: 10.211.55.4
+#    port: 6379
+#    database: 0
+#    jedis:
+#      pool:
+#        # 最大阻塞等待时间，负数表示没有限制
+#        max-wait: -1
+#        # 连接池中的最大空闲连接
+#        max-idle: 5
+#        # 连接池中的最小空闲连接
+#        min-idle: 0
+#        # 连接池中最大连接数，负数表示没有限制
+#        max-active: 20
+#  autoconfigure:
+#    exclude:
+##      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+#      - org.redisson.spring.starter.RedissonAutoConfiguration
+#mybatis:
+#  configLocation: classpath:mybatis/mybatis-config.xml
+#  mapper-locations: classpath:mybatis/mapper/*.xml
+#
+#rocketmq:
+#  name-server: 127.0.0.1:9876
+#  producer:
+#    group: demo_group
+#    send-message-timeout: 30000

@@ -1,0 +1,16 @@
+package com.cxy.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class WsRequest {
+    private String msg;
+    private Integer code;
+    private Map<String,Object> extra;
+}
