@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         AuthenticationUser userDetails = (AuthenticationUser) authentication.getPrincipal();
         //把sessionId加入cookie
-        CookieUtil.setCookie(httpServletResponse, CookieTypeEnum.SESSIONID.getType(), httpServletRequest.getSession().getId());
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("user", userDetails.getUser());
+        CookieUtil.setCookie(httpServletResponse, CookieTypeEnum.SESSIONID.getType(), session.getId());
         CookieUtil.setCookie(httpServletResponse, CookieTypeEnum.USERID.getType(), userDetails.getUser().getId().toString());
 //        CookieUtil.setCookie(httpServletResponse, "Secure", "true");
 //        CookieUtil.setCookie(httpServletResponse, "SameSite", "None");

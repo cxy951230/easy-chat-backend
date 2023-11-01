@@ -42,7 +42,7 @@ public abstract class AbstractServerHandler extends SimpleChannelInboundHandler<
             WsRequest wsRequest = JSONObject.parseObject(request, WsRequest.class);
             RequestType code = RequestType.getByCode(wsRequest.getCode());
 
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase(Locale.US)));
+//            ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase(Locale.US)));
             switch (code){
                 case PING:
                     webSocketSessionHandler.heartBeat(ctx);

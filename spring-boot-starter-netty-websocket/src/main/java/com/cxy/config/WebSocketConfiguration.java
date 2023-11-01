@@ -1,7 +1,6 @@
 package com.cxy.config;
 
 import com.cxy.handler.*;
-import com.cxy.http.SessionRepository;
 import com.cxy.utils.JedisUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -13,6 +12,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.cors.CorsConfig;
+import io.netty.handler.codec.http.cors.CorsConfigBuilder;
+import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.logging.LogLevel;
@@ -34,9 +36,6 @@ public class WebSocketConfiguration {
     private Integer expire;
 
     @Autowired
-    private SessionRepository sessionRepository;
-
-    @Autowired
     private JedisUtil jedisUtil;
 
     @Autowired
@@ -46,7 +45,7 @@ public class WebSocketConfiguration {
     private AbstractServerHandler serverHandler;
 
     @Autowired
-    private AbstractCookieCheckHandler cookieCheckHandler;
+    private AbstractUrlParamsProcessHandler paramsProcessHandler;
 
     @Bean
     public ServerBootstrap serverBootstrap(){
@@ -65,9 +64,14 @@ public class WebSocketConfiguration {
                             pipeline.addLast(new HttpServerCodec());
                             pipeline.addLast(new HttpObjectAggregator(65536));
                             pipeline.addLast(new WebSocketServerCompressionHandler());
-                            pipeline.addLast(cookieCheckHandler);
-                            pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
+                            pipeline.addLast(paramsProcessHandler);
+                            // 构建 CorsConfig，设置允许的跨域请求信息
+                            CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build();
+                            // 添加 CorsHandler 处理器
+                            pipeline.addLast(new CorsHandler(corsConfig));
                             pipeline.addLast(new PathCheckHandler(WEBSOCKET_PATH));
+//                            pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
+                            pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true, 65536, false, true, 1000L));
                             pipeline.addLast(webSocketSessionHandler);
                             pipeline.addLast(serverHandler);
                         }
@@ -90,9 +94,9 @@ public class WebSocketConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(AbstractCookieCheckHandler.class)
-    public AbstractCookieCheckHandler defaultCookieCheckHandler(){
-        return new DefaultCookieCheckHandler(sessionRepository);
+    @ConditionalOnMissingBean(AbstractUrlParamsProcessHandler.class)
+    public AbstractUrlParamsProcessHandler defaultUrlParamsProcessHandler(){
+        return new DefaultUrlParamsProcessHandler();
     }
 
     @Bean

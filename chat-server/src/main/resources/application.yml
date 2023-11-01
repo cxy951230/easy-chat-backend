@@ -28,4 +28,4 @@ mybatis-plus:
 websocket:
   uri: /ws
   port: 8007
-  expire: 10
+  expire: 200

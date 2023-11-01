@@ -1,7 +1,7 @@
 package com.cxy.entity.enums;
 
 public enum CookieTypeEnum {
-    USERID("uid", "适残"),
+    USERID("uid", "用户id"),
     SESSIONID("sessionId", "cookie中的sessionId");
 
     private String type;

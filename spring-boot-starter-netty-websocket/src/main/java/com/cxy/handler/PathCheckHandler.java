@@ -1,18 +1,18 @@
 package com.cxy.handler;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import com.cxy.utils.HttpUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
-import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class PathCheckHandler extends ChannelInboundHandlerAdapter {
@@ -35,23 +35,25 @@ public class PathCheckHandler extends ChannelInboundHandlerAdapter {
         final HttpRequest req = (HttpRequest) httpObject;
         if (!isWebSocketPath(req)){
             logger.info("WEBSOCKET PATH ERROR");
-            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN, ctx.alloc().buffer(0)));
+            HttpUtil.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN, ctx.alloc().buffer(0)));
             return;
         }
+        ctx.pipeline().remove(this);
+        ctx.fireChannelRead(msg);
+//        if(isInfoReq(req)){
+//            logger.info("WEBSOCKET INFO REQUEST");
+//            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, OK, ctx.alloc().buffer(0)));
+//            return;
+//        }
     }
 
-    private void sendHttpResponse(ChannelHandlerContext ctx, HttpRequest req, HttpResponse res) {
-        ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || res.status().code() != 200) {
-            f.addListener(ChannelFutureListener.CLOSE);
-        }
-    }
 
     private boolean isWebSocketPath(HttpRequest req) {
         String uri = req.uri();
         boolean checkStartUri = uri.startsWith(websocketPath);
         boolean checkNextUri = "/".equals(websocketPath) || checkNextUri(uri, websocketPath);
 //        return serverConfig.checkStartsWith() ? (checkStartUri && checkNextUri) : uri.equals(websocketPath);
+//        boolean res = checkStartUri && checkNextUri;
         return checkStartUri && checkNextUri;
     }
 
@@ -63,4 +65,13 @@ public class PathCheckHandler extends ChannelInboundHandlerAdapter {
         }
         return true;
     }
+
+    //    private boolean isInfoReq(HttpRequest req){
+//        String infoString = "/info";
+//        String uri = req.uri();
+//        boolean checkStartUri = uri.startsWith(infoString);
+//        boolean checkNextUri = "/".equals(infoString) || checkNextUri(uri, infoString);
+////        return serverConfig.checkStartsWith() ? (checkStartUri && checkNextUri) : uri.equals(websocketPath);
+//        return checkStartUri && checkNextUri;
+//    }
 }
